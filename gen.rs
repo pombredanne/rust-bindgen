@@ -277,8 +277,8 @@ fn cstruct_to_rs(ctx: &GenCtx, name: ~str, fields: ~[@FieldInfo]) -> @ast::item 
         @{ traits: ~[],
            fields: move fs,
            methods: ~[],
-           dtor: None,
-           ctor_id: None
+           ctor: None,
+           dtor: None
         },
         ~[]
     );
@@ -322,8 +322,8 @@ fn cunion_to_rs(ctx: &GenCtx, name: ~str, fields: ~[@FieldInfo]) -> ~[@ast::item
         @{ traits: ~[],
            fields: ~[data],
            methods: ~[],
-           dtor: None,
-           ctor_id: None
+           ctor: None,
+           dtor: None
         },
         ~[]
     );
@@ -369,7 +369,7 @@ fn cunion_to_rs(ctx: &GenCtx, name: ~str, fields: ~[@FieldInfo]) -> ~[@ast::item
         ~[],
         None,
         cty_to_rs(ctx, union),
-        Some(move fs)
+        move fs
     );
 
     return ~[
@@ -464,7 +464,7 @@ fn cfunc_to_rs(ctx: &GenCtx, name: ~str, rty: @Type,
            };
 }
 
-fn cty_to_rs(ctx: &GenCtx, ty: @Type) -> @ast::Ty {
+fn cty_to_rs(ctx: &GenCtx, ty: @Type) -> @ast::ty {
     return match *ty {
         TVoid => mk_ty(ctx, ~"c_void"),
         TInt(i) => match i {
@@ -503,7 +503,7 @@ fn cty_to_rs(ctx: &GenCtx, ty: @Type) -> @ast::Ty {
     };
 }
 
-fn mk_ty(ctx: &GenCtx, name: ~str) -> @ast::Ty {
+fn mk_ty(ctx: &GenCtx, name: ~str) -> @ast::ty {
     let ty = ast::ty_path(
         @{ span: dummy_sp(),
            global: false,
@@ -520,7 +520,7 @@ fn mk_ty(ctx: &GenCtx, name: ~str) -> @ast::Ty {
            };
 }
 
-fn mk_ptrty(ctx: &GenCtx, base: @ast::Ty) -> @ast::Ty {
+fn mk_ptrty(ctx: &GenCtx, base: @ast::ty) -> @ast::ty {
     let ty = ast::ty_ptr({
         ty: base,
         mutbl: ast::m_imm
@@ -532,7 +532,7 @@ fn mk_ptrty(ctx: &GenCtx, base: @ast::Ty) -> @ast::Ty {
            };
 }
 
-fn mk_arrty(ctx: &GenCtx, base: @ast::Ty, n: uint) -> @ast::Ty {
+fn mk_arrty(ctx: &GenCtx, base: @ast::ty, n: uint) -> @ast::ty {
     let vec = @{
         id: ctx.ext_cx.next_id(),
         node: ast::ty_vec({
@@ -549,7 +549,7 @@ fn mk_arrty(ctx: &GenCtx, base: @ast::Ty, n: uint) -> @ast::Ty {
            };
 }
 
-fn mk_fnty(ctx: &GenCtx) -> @ast::Ty {
+fn mk_fnty(ctx: &GenCtx) -> @ast::ty {
     let ty = mk_ptrty(ctx, mk_ty(ctx, ~"u8"));
 
     return @{ id: ctx.ext_cx.next_id(),
